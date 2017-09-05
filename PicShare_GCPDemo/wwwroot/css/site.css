@@ -1,5 +1,5 @@
 ﻿body {
-    padding-top: 50px;
+    padding-top: 70px;
     padding-bottom: 20px;
 }
 
@@ -32,4 +32,28 @@
     .carousel-caption {
         display: none;
     }
+}
+
+
+/* Bootstrap Customizations */
+.navbar {
+    background-color: lavender;
+}
+
+.navbar-brand {
+    height: 60px;
+}
+
+.navbar-nav > li > a {
+    padding-top: 23px;
+}
+
+#logo {
+    height: 50px;
+    margin-top: -10px;
+    display: inline-block;
+}
+
+#siteName {
+    display: inline-block;
 }
