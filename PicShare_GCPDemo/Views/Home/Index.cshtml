@@ -2,6 +2,7 @@
     ViewData["Title"] = "Home Page";
 }
 
+
 <div class="form-group has-feedback">
     <label class="sr-only" for="imageSearch">Search</label>
     <div class="input-group">
@@ -10,4 +11,35 @@
         </span>
         <input id="imageSearch" type="search" class="form-control" placeholder="Search images" aria-describedby="inputSuccess2Status">
     </div>
+    <button type="button" class="btn btn-default">Search</button>
 </div>
+
+<section id="searchResults">
+    <div>
+        <img />
+        <p></p>
+    </div>
+</section>
+
+<section>
+    <h1>Upload a Pic!</h1>
+    <form id="uploadForm" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="image">Image:</label>
+            <input id="image" name="image" type="file" />
+        </div>
+        <div class="form-group">
+            <label for="caption">Caption:</label>
+            <input id="caption" type="text" placeholder="Caption" class="form-control" data-bind="text: uploadCaption" />
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+</section>
+
+@section Head {
+    <link href="~/lib/dropzone/dist/min/dropzone.min.css" rel="stylesheet" />
+}
+
+@section Scripts {
+    <script type="text/javascript" src="~/lib/dropzone/dist/min/dropzone.min.js"></script>
+}
