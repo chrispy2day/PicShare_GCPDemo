@@ -24,9 +24,55 @@ namespace PicShare_GCPDemo.Controllers
             _env = environment;
         }
 
+        // POST: api/Pictures
+        [HttpPost]
+        public async Task<IActionResult> PostPicture(IFormFile image, string caption)
+        {
+            var filename = await SaveImage(image);
+            var picture = new Picture
+            {
+                AddedDate = DateTimeOffset.Now,
+                Caption = caption,
+                FilePath = "/images/pics/" + filename
+            };
+
+            _context.Picture.Add(picture);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetPicture", new { id = picture.PictureId }, picture);
+        }
+
+        private async Task<string> SaveImage(IFormFile file)
+        {
+            var path = GetFilePath(file.FileName);
+
+            if (file.Length > 0)
+            {
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+            }
+
+            return path.Substring(path.LastIndexOf(Path.DirectorySeparatorChar) + 1);
+        }
+
+        private string GetFilePath(string localFilename)
+        {
+            // get the full path to the file
+            var tempName = Path.GetRandomFileName();
+            var name = tempName.Substring(0, tempName.IndexOf('.')) + 
+                localFilename.Substring(localFilename.IndexOf('.'));
+
+            // create the path
+            var sep = Path.DirectorySeparatorChar;
+            var filePath = _env.WebRootPath + sep + "images" + sep + "pics" + sep + name;
+            return filePath;
+        }
+
         // GET: api/Pictures
         [HttpGet]
-        public IEnumerable<Picture> GetPicture(string search, int take = 20, int offset = 0)
+        public IEnumerable<Picture> GetPicture(string search, int take = 15, int offset = 0)
         {
             if (string.IsNullOrWhiteSpace(search))
                 return _context.Picture
@@ -42,61 +88,23 @@ namespace PicShare_GCPDemo.Controllers
         }
 
         // GET: api/Pictures/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetPicture([FromRoute] int id)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //[HttpGet("{id}")]
+        //public async Task<IActionResult> GetPicture([FromRoute] int id)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-            var picture = await _context.Picture.SingleOrDefaultAsync(m => m.PictureId == id);
+        //    var picture = await _context.Picture.SingleOrDefaultAsync(m => m.PictureId == id);
 
-            if (picture == null)
-            {
-                return NotFound();
-            }
+        //    if (picture == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return Ok(picture);
-        }
-
-        // POST: api/Pictures
-        [HttpPost]
-        public async Task<IActionResult> PostPicture(PictureUpload upload)
-        {
-            var filename = await SaveImage(upload.file);
-            var picture = new Picture
-            {
-                AddedDate = DateTimeOffset.Now,
-                Caption = upload.Caption,
-                FileName = filename
-            };
-
-            _context.Picture.Add(picture);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetPicture", new { id = picture.PictureId }, picture);
-        }
-
-        private async Task<string> SaveImage(IFormFile file)
-        {
-            long size = file.Length;
-
-            // get the full path to the file
-            var name = Path.GetRandomFileName();
-            var sep = Path.DirectorySeparatorChar;
-            var filePath = _env.WebRootPath + sep + "images" + sep + "pics" + sep + name;
-
-            if (file.Length > 0)
-            {
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-            }
-
-            return name;
-        }
+        //    return Ok(picture);
+        //}
 
         // PUT: api/Pictures/5
         //[HttpPut("{id}")]

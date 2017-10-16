@@ -34,6 +34,27 @@
     }
 }
 
+.picsContainer  {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.picResult {
+    width: 170px;
+    height: 190px;
+}
+
+.picResult img {
+    max-height: 150px;
+    max-width: 150px;
+    display: block;
+    margin: 0 auto;
+}
+
+.picResult p {
+    text-align: center;
+}
+
 
 /* Bootstrap Customizations */
 .navbar {
