@@ -4,10 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using PicShare_GCPDemo.Models;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using Google.Cloud.Storage.V1;
+using Microsoft.Extensions.Options;
 
 namespace PicShare_GCPDemo.Controllers
 {
@@ -17,23 +18,27 @@ namespace PicShare_GCPDemo.Controllers
     {
         private readonly PicShareContext _context;
         private readonly IHostingEnvironment _env;
+        private readonly StorageClient _storage;
+        private readonly CloudStorageOptions _options;
 
-        public PicturesController(PicShareContext context, IHostingEnvironment environment)
+        public PicturesController(PicShareContext context, IHostingEnvironment environment, IOptions<CloudStorageOptions> options)
         {
             _context = context;
             _env = environment;
+            _storage = StorageClient.Create();
+            _options = options.Value;
         }
 
         // POST: api/Pictures
         [HttpPost]
         public async Task<IActionResult> PostPicture(IFormFile image, string caption)
         {
-            var filename = await SaveImage(image);
+            var link = await SaveImage(image);
             var picture = new Picture
             {
                 AddedDate = DateTimeOffset.Now,
                 Caption = caption,
-                FilePath = "/images/pics/" + filename
+                FilePath = link
             };
 
             _context.Picture.Add(picture);
@@ -44,30 +49,24 @@ namespace PicShare_GCPDemo.Controllers
 
         private async Task<string> SaveImage(IFormFile file)
         {
-            var path = GetFilePath(file.FileName);
-
+            _options.ObjectName = GetFileName(file.FileName);
+            var link = string.Empty;
             if (file.Length > 0)
             {
-                using (var stream = new FileStream(path, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
+                var result = await _storage.UploadObjectAsync(_options.BucketName, _options.ObjectName, "image/*", file.OpenReadStream());
+                link = result.MediaLink;
             }
 
-            return path.Substring(path.LastIndexOf(Path.DirectorySeparatorChar) + 1);
+            return link;
         }
 
-        private string GetFilePath(string localFilename)
+        private string GetFileName(string localFilename)
         {
             // get the full path to the file
             var tempName = Path.GetRandomFileName();
             var name = tempName.Substring(0, tempName.IndexOf('.')) + 
                 localFilename.Substring(localFilename.IndexOf('.'));
-
-            // create the path
-            var sep = Path.DirectorySeparatorChar;
-            var filePath = _env.WebRootPath + sep + "images" + sep + "pics" + sep + name;
-            return filePath;
+            return name;
         }
 
         // GET: api/Pictures

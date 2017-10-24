@@ -24,7 +24,8 @@ namespace PicShare_GCPDemo
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-
+            services.Configure<CloudStorageOptions>(
+                Configuration.GetSection("GoogleCloudStorage"));
             services.AddDbContext<PicShareContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("PicShareContext")));
         }
