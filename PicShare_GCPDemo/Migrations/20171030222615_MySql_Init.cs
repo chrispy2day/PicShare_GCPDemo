@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace PicShare_GCPDemo.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class MySql_Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -14,10 +14,10 @@ namespace PicShare_GCPDemo.Migrations
                 columns: table => new
                 {
                     PictureId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    AddedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    Caption = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    AddedDate = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
+                    Caption = table.Column<string>(type: "longtext", nullable: true),
+                    FilePath = table.Column<string>(type: "longtext", nullable: true)
                 },
                 constraints: table =>
                 {

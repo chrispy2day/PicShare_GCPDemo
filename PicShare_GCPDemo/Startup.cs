@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using PicShare_GCPDemo.Models;
+using MySql.Data.MySqlClient;
 
 namespace PicShare_GCPDemo
 {
@@ -27,7 +24,18 @@ namespace PicShare_GCPDemo
             services.Configure<CloudStorageOptions>(
                 Configuration.GetSection("GoogleCloudStorage"));
             services.AddDbContext<PicShareContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("PicShareContext")));
+                options.UseMySql(BuildMySqlConnectionString()));
+        }
+
+        private string BuildMySqlConnectionString()
+        {
+            var connectionString = new MySqlConnectionStringBuilder(
+                Configuration["CloudSql:ConnectionString"])
+            {
+                SslMode = MySqlSslMode.Required,
+                CertificateFile = Configuration["CloudSql:CertificateFile"]
+            };
+            return connectionString.ConnectionString;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

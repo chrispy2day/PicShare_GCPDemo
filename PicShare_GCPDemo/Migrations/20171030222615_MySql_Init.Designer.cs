@@ -11,15 +11,15 @@ using System;
 namespace PicShare_GCPDemo.Migrations
 {
     [DbContext(typeof(PicShareContext))]
-    [Migration("20171014044359_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20171030222615_MySql_Init")]
+    partial class MySql_Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.0.0-rtm-26452")
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn)
+                .HasAnnotation("ProductVersion", "2.0.0-rtm-26452");
 
             modelBuilder.Entity("PicShare_GCPDemo.Models.Picture", b =>
                 {
@@ -30,7 +30,7 @@ namespace PicShare_GCPDemo.Migrations
 
                     b.Property<string>("Caption");
 
-                    b.Property<string>("FileName");
+                    b.Property<string>("FilePath");
 
                     b.HasKey("PictureId");
 
